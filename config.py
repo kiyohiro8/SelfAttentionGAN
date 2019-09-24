@@ -11,7 +11,7 @@ class Config():
         # 学習のエポック数。
         self.EPOCH = 2000
         # 1 エポックあたりの iteration 数。
-        self.ITER_PER_EPOCH = 1000
+        self.ITER_PER_EPOCH = 100
         # 学習を途中から再開する時用のフラグです。
         self.RESUME_TRAIN = False
         # result ディレクトリ下のどのディレクトリの結果から再開するか。
@@ -26,7 +26,7 @@ class Config():
         # ミニバッチサイズです。
         self.BATCH_SIZE = 32
         # 学習率です。
-        self.D_LEARNING_RATE = 0.0003
+        self.D_LEARNING_RATE = 0.0004
         self.G_LEARNING_RATE = 0.0001
         # Adam optimizerのハイパーパラメータです。
         self.BETA_1 = 0.0
@@ -44,13 +44,13 @@ class Config():
         self.DATA_DIR = "./data/"
 
         # 学習時の入力画像サイズです。 (height, width, channel)
-        self.IMAGE_SHAPE = (128, 128, 3)
+        self.IMAGE_SHAPE = (64, 64, 3)
         # 訓練データのファイル拡張子です。
         # TODO: jpg、pngが混在していても使用できるようにする。
         self.DATA_EXT = "*.jpg"
 
         # 訓練データを格納しているディレクトリの名前です。
-        self.DATASET = "ramen_cam"
+        self.DATASET = "all-dogs"
 
         # 使用するモデルのweightファイルのパスです。
         self.MODEL_FILE_PATH = "./result/180930_0108/weights/ramen/200000.hdf5"

@@ -12,6 +12,7 @@ from keras.models import Model, load_model
 from keras.layers import Input
 from keras import optimizers
 import keras.backend as K
+import tensorflow as tf
 
 import utils
 import net_utils
@@ -36,6 +37,8 @@ class SAGAN():
                                              self.config.NUMBER_RESIDUAL_BLOCKS, base_name="generator")
             #self.generator = net_utils.generator(self.config.LATENT_DIM, self.config.IMAGE_SHAPE,
             #                                 self.config.NUMBER_RESIDUAL_BLOCKS, base_name="generator")
+        self.generator.summary()
+        self.discriminator.summary()
 
         D_real_input = Input(shape=self.config.IMAGE_SHAPE)
         noise_vector = Input(shape=(self.config.LATENT_DIM, ))
@@ -123,11 +126,15 @@ class SAGAN():
         fixed_noise = np.random.normal(size=(number_samples, self.config.LATENT_DIM)).astype('float32')
 
         for epoch in range(self.config.EPOCH):
+            # getting gamma coefficient in Self-Attention layer.
+            G_gamma = self.generator.get_layer("generator_sa").get_weights()[0]
+            D_gamma = self.discriminator.get_layer("discriminator_sa").get_weights()[0]
+            print("generator self-attention gamma: {}, discriminator self-attention gamma: {}".format(G_gamma, D_gamma))
             for iter in range(self.config.ITER_PER_EPOCH):
                 for _ in range(self.config.NUM_CRITICS):
-                    batch_files = next(dataset)
-                    real_batch = np.array([utils.get_image(file, input_hw=self.config.IMAGE_SHAPE[0])
-                                           for file in batch_files])
+                    real_batch = np.array(next(dataset))
+                    #real_batch = np.array([utils.get_image(file, input_hw=self.config.IMAGE_SHAPE[0])
+                    #                       for file in batch_files])
 
                     noise = np.random.normal(size=(self.config.BATCH_SIZE, self.config.LATENT_DIM))
                     epsilon = np.random.uniform(size=(self.config.BATCH_SIZE, 1, 1, 1))

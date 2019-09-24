@@ -41,7 +41,6 @@ def generator(latent_dim, image_shape, num_res_blocks, base_name):
     x = BatchNormalization(momentum=0.9, epsilon=1e-5, name=base_name + "_bn1")(x, training=1)
     x = Activation("relu")(x)
 
-    x = SelfAttention(ch=64*4)(x)
 
     # size//8→size//4→size//2→size
     x = UpSampling2D((2, 2))(x)
@@ -49,6 +48,8 @@ def generator(latent_dim, image_shape, num_res_blocks, base_name):
                         name=base_name + "_conv2")(x)
     x = BatchNormalization(momentum=0.9, epsilon=1e-5, name=base_name + "_bn2")(x, training=1)
     x = Activation("relu")(x)
+
+    x = SelfAttention(ch=64*2, name=base_name+"_sa")(x)
 
     x = UpSampling2D((2, 2))(x)
     x = Conv2D(64*1, kernel_size=5, strides=2, padding='same', kernel_initializer=initializer,
@@ -77,14 +78,14 @@ def generator_SN(latent_dim, image_shape, num_res_blocks, base_name):
     x = BatchNormalization(momentum=0.9, epsilon=1e-5, name=base_name + "_bn1")(x, training=1)
     x = Activation("relu")(x)
 
-    x = SelfAttention(ch=64*4)(x)
-
     # size//8→size//4→size//2→size
     x = UpSampling2D((2, 2))(x)
     x = ConvSN2D(64*2, kernel_size=3, strides=1, padding='same', kernel_initializer=initializer,
                         name=base_name + "_conv2")(x)
     x = BatchNormalization(momentum=0.9, epsilon=1e-5, name=base_name + "_bn2")(x, training=1)
     x = Activation("relu")(x)
+
+    x = SelfAttention(ch=64*2, name=base_name+"_sa")(x)
 
     x = UpSampling2D((2, 2))(x)
     x = ConvSN2D(64*1, kernel_size=5, strides=2, padding='same', kernel_initializer=initializer,
@@ -108,6 +109,8 @@ def discriminator(input_shape, base_name, num_res_blocks=0,is_D=True, use_res=Fa
 
     D = LeakyReLU(0.2)(D)
 
+    D = SelfAttention(ch=64, name=base_name+"_sa")(D)
+
     D = Conv2D(128, kernel_size=4, strides=2, padding="same", kernel_initializer=initializer_d,
                use_bias=False,
                name=base_name + "_conv2")(D)
@@ -120,7 +123,6 @@ def discriminator(input_shape, base_name, num_res_blocks=0,is_D=True, use_res=Fa
                name=base_name + "_conv3")(D)
     #D = BatchNormalization(momentum=0.9, epsilon=1e-5, name=base_name + "_bn2")(D, training=1)
     D = LeakyReLU(0.2)(D)
-    D = SelfAttention(ch=256)(D)
 
     D = Conv2D(512, kernel_size=4, strides=2, padding="same", kernel_initializer=initializer_d,
                use_bias=False,
@@ -149,6 +151,8 @@ def discriminator_SN(input_shape, base_name, num_res_blocks=0,is_D=True, use_res
 
     D = LeakyReLU(0.2)(D)
 
+    D = SelfAttention(ch=64, name=base_name+"_sa")(D)
+
     D = ConvSN2D(128, kernel_size=4, strides=2, padding="same", kernel_initializer=initializer_d,
                use_bias=False,
                name=base_name + "_conv2")(D)
@@ -161,7 +165,7 @@ def discriminator_SN(input_shape, base_name, num_res_blocks=0,is_D=True, use_res
                name=base_name + "_conv3")(D)
     #D = BatchNormalization(momentum=0.9, epsilon=1e-5, name=base_name + "_bn2")(D, training=1)
     D = LeakyReLU(0.2)(D)
-    D = SelfAttention(ch=256)(D)
+
 
     D = ConvSN2D(512, kernel_size=4, strides=2, padding="same", kernel_initializer=initializer_d,
                use_bias=False,
